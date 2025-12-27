@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//! Post table 
+model Post {
+  id         String     @id @default(ulid())
+  title      String     @db.VarChar(250)
+  content    String     @db.Text
+  thumbnail  String?
+  isFeatured Boolean    @default(false)
+  status     PostStatus @default(PUBLISHED)
+  tags       String[]
+  views      Int        @default(0)
+  autherId   String //? better auth
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comments   Comment[]
+
+  @@index([autherId])
+  @@map("posts")
+}
+
+//! Comment table
+model Comment {
+  id        String        @id @default(uuid())
+  content   String        @db.Text
+  autherId  String
+  postId    String
+  post      Post          @relation(fields: [postId], references: [id])
+  parentID  String?
+  parent    Comment?      @relation("CommentReplies", fields: [parentID], references: [id])
+  replies   Comment[]     @relation("CommentReplies")
+  status    CommentStatus @default(APPROVED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([autherId])
+  @@index([postId])
+  @@map("comments")
+}
+
+//! Enums
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  APPROVED
+}
+
+enum CommentStatus {
+  APPROVED
+  REJECT
+}
