@@ -1,21 +1,11 @@
-import express, { NextFunction, Request, Response } from "express";
-import { postController } from "./post.controller";
-import {auth as betterAuth} from "../lib/auth";
-const router=express.Router();
+import express, { Router } from "express";
 
-const auth=(...roles:any)=>{
-    return async (req:Request,res:Response,next:NextFunction)=>{
-        //! get session
-        const session=await betterAuth.api.getSession({
-            headers:req.headers as any
-        })
-        console.log(session)
-        next();
-    }
-    
-}
+import auth, { UserRole } from "../middlewares/auth";
+import { PostController } from "./post.controller";
 
-router.post("/",auth("USER"),postController.createPost);
-router.get("/",postController.getAllPost);
+const router = express.Router();
 
-export const postRouter=router;
+router.get("/",PostController.getAllPost);
+router.post("/", auth(UserRole.USER), PostController.createPost);
+
+export const postRouter: Router = router;
