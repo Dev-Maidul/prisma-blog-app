@@ -1,6 +1,6 @@
-import { Post, PostStatus } from "../../generated/prisma/client";
-import { PostWhereInput } from "../../generated/prisma/models";
-import { prisma } from "../lib/prisma";
+import { Post, PostStatus } from "../../../generated/prisma/client";
+import { PostWhereInput } from "../../../generated/prisma/models";
+import { prisma } from "../../lib/prisma";
 
 const createPost = async (data: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'authorId'>, userId: string) => {
     const result = await prisma.post.create({
